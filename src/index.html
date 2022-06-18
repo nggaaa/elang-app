@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no"
+      name="viewport"
+    />
+
+    <link rel="stylesheet" href="./assets/css/dependency.css" />
+
+    <link rel="stylesheet" href="./assets/libs/fontawesome/css/all.min.css" />
+
+    <!-- CSS Libraries -->
+
+    <!-- Template CSS -->
+    <link rel="stylesheet" href="./assets/css/style.css" />
+    <link rel="stylesheet" href="./assets/css/components.css" />
+    <link rel="stylesheet" href="./assets/css/custom.css" />
+    <!-- Middlewares -->
+    <script src="./assets/js/middleware/auth.js"></script>
+  </head>
+
+  <body>
+    <div class="preloader">
+      <div class="loading">
+        <div class="spinner-border" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="app">
+      <div class="main-wrapper">
+        <div id="m_navbar"></div>
+        <div class="main-sidebar position-fixed">
+          <aside id="sidebar-wrapper"></aside>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content" style="min-height: 522px">
+          <section class="section">
+            <div class="section-header">
+              <h1>Dashboard</h1>
+            </div>
+            <div class="row justify-content-center">
+              <div class="col-md-4 col-12">
+                <div class="card card-statistic-1">
+                  <div class="card-icon bg-primary">
+                    <i class="fas fa-globe-europe"></i>
+                  </div>
+                  <div class="card-wrap">
+                    <div class="card-header">
+                      <h4>English</h4>
+                    </div>
+                    <div class="card-body" id="engScore">10</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4 col-12">
+                <div class="card card-statistic-1">
+                  <div class="card-icon bg-success">
+                    <i class="fas fa-kaaba"></i>
+                  </div>
+                  <div class="card-wrap">
+                    <div class="card-header">
+                      <h4>Arabic</h4>
+                    </div>
+                    <div class="card-body" id="arabScore">42</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4 col-12">
+                <div class="card card-statistic-1">
+                  <div class="card-icon bg-warning">
+                    <i class="fas fa-clipboard-check"></i>
+                  </div>
+                  <div class="card-wrap">
+                    <div class="card-header">
+                      <h4>Selesai</h4>
+                    </div>
+                    <div class="card-body" id="lessonComplete">0</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12">
+                <div class="card">
+                  <div class="card-body">
+                    <p
+                      style="line-height: 1rem"
+                      class="text-center mt-3"
+                      id="q_content"
+                    ></p>
+                    <p
+                      style="line-height: 0.5rem"
+                      class="text-center font-weight-bold text-primary"
+                      id="q_author"
+                    >
+                      Loading
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+        <footer class="main-footer">
+          <div class="footer-left"></div>
+          <div class="footer-right"></div>
+        </footer>
+      </div>
+    </div>
+
+    <!-- Components -->
+    <script src="./assets/libs/jquery/dist/jquery.min.js"></script>
+    <script src="./assets/components/m_sidebar.js"></script>
+    <script src="./assets/components/m_navbar.js"></script>
+
+    <script src="./assets/js/dependency.js"></script>
+    <script src="./assets/js/stisla.js"></script>
+
+    <!-- Template JS File -->
+    <script src="./assets/js/scripts.js"></script>
+    <script src="./assets/js/custom.js"></script>
+    <script>
+      $("#engScore").text(userdata.eng_score);
+      $("#arabScore").text(userdata.arab_score);
+      $.ajax({
+        url: env.server + "/mycompletelessons",
+        type: "POST",
+        data: {
+          api_token: user.api_token,
+        },
+        success: (data) => {
+          $("#lessonComplete").text(data.length);
+        },
+      });
+      $.ajax({
+        url: "https://api.quotable.io/random",
+        type: "GET",
+        dataType: "json",
+        success: function (data) {
+          $("#q_content").text(data.content);
+          $("#q_author").text(data.author);
+        },
+      });
+      $.ajax({
+        url: env.server + "/mycompletelessons",
+        type: "POST",
+        data: {
+          api_token: user.api_token,
+        },
+        success: (data) => {
+          $("#lessonComplete").text(data.length);
+        },
+      });
+    </script>
+
+    <script>
+      $("[data-link=home]").addClass("active");
+    </script>
+  </body>
+</html>

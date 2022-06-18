@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no"
+      name="viewport"
+    />
+
+    <link rel="stylesheet" href="../assets/css/dependency.css" />
+    <link rel="stylesheet" href="../assets/libs/fontawesome/css/all.min.css" />
+
+    <!-- Template CSS -->
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/components.css" />
+    <link rel="stylesheet" href="../assets/css/custom.css" />
+
+    <style>
+      .rv-root {
+        z-index: 9999;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="app">
+      <section class="section">
+        <div class="container" style="margin-top: 6rem">
+          <div class="row justify-content-center">
+            <div class="col-12 col-md-5">
+              <div
+                class="card card-primary animate__animated animate__bounceIn"
+              >
+                <div class="card-header"><h4>Masuk</h4></div>
+                <div class="card-body">
+                  <form method="POST" action="" id="formlogin">
+                    <div class="form-group">
+                      <label for="email">Email</label>
+                      <input
+                        id="email"
+                        type="email"
+                        class="form-control"
+                        name="email"
+                        tabindex="1"
+                        required
+                        autofocus
+                      />
+                    </div>
+
+                    <div class="form-group">
+                      <div class="d-block">
+                        <label for="password" class="control-label"
+                          >Password</label
+                        >
+                        <!-- <div class="float-right">
+                          <a href="./forgot-password.html" class="text-small">
+                            Forgot Password?
+                          </a>
+                        </div> -->
+                      </div>
+                      <input
+                        id="password"
+                        type="password"
+                        class="form-control"
+                        name="password"
+                        tabindex="2"
+                        required
+                      />
+                    </div>
+
+                    <div class="form-group">
+                      <div class="custom-control custom-checkbox">
+                        <input
+                          type="checkbox"
+                          class="custom-control-input"
+                          tabindex="3"
+                          id="rememberme"
+                        />
+                        <label class="custom-control-label" for="rememberme"
+                          >Ingat saya</label
+                        >
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <button
+                        type="submit"
+                        class="btn btn-primary btn-lg btn-block"
+                        tabindex="4"
+                      >
+                        Masuk
+                      </button>
+                    </div>
+                  </form>
+                  <div class="text-center mt-2 mb-2">
+                    <div class="text-job text-muted">Tidak punya akun?</div>
+                    <a
+                      class="text-primary text-center"
+                      id="directregister"
+                      href="./register.html"
+                      >Daftar</a
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="d-md-flex col-6 offset-md-1">
+              <div
+                class="d-flex w-100 h-100 justify-content-center align-items-center animate__animated animate__bounceIn animate__delay-1s"
+              >
+                <img
+                  class="w-100"
+                  src="../assets/img/undraw_online_test_gba7.svg"
+                  alt=""
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="mt-1 simple-footer animate__animated animate__fadeIn animate__delay-2s"
+          >
+            Copyright &copy; Stisla 2018
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- General JS Scripts -->
+    <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
+    <script src="../assets/js/dependency.js"></script>
+    <script src="../assets/js/stisla.js"></script>
+
+    <!-- Template JS File -->
+    <script src="../assets/js/scripts.js"></script>
+
+    <!-- Page Specific JS File -->
+    <script src="../assets/js/captcha.js"></script>
+    <script>
+      $("#formlogin").submit((e) => {
+        e.preventDefault();
+
+        RVerify.action((res) => {
+          if (res === 1) {
+            var form = $("#formlogin");
+            $("button[type='submit']").prop("disabled", true);
+            $("button[type='submit']").addClass("disabled");
+
+            $.post(env.server + "/login", form.serialize(), (data) => {
+              if (data.status == "success") {
+                var x;
+                if ($("#rememberme").is(":checked") == true) x = localStorage;
+                else x = sessionStorage;
+                x.setItem("api_token", data.api_token);
+                window.location.href = "../index.html";
+              } else if (data.status == "error") {
+                iziToast.error({
+                  title: "Error",
+                  message: data.message,
+                  position: "topRight",
+                });
+                $("#password").val("");
+                $("button[type='submit']").prop("disabled", false);
+                $("button[type='submit']").removeClass("disabled");
+              }
+            });
+          } else {
+            iziToast.error({
+              title: "Error",
+              message: "Captcha salah",
+              position: "topRight",
+            });
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

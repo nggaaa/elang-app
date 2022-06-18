@@ -1,0 +1,275 @@
+<!-- https://drive.google.com/uc?id=[id] -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no"
+      name="viewport"
+    />
+
+    <!-- General CSS Files -->
+
+    <link rel="stylesheet" href="./assets/css/dependency.css" />
+    <link rel="stylesheet" href="./assets/libs/fontawesome/css/all.min.css" />
+
+    <!-- CSS Libraries -->
+
+    <!-- Template CSS -->
+    <link rel="stylesheet" href="./assets/css/style.css" />
+    <link rel="stylesheet" href="./assets/css/components.css" />
+    <link rel="stylesheet" href="./assets/css/custom.css" />
+    <!-- Middlewares -->
+    <script src="./assets/js/middleware/auth.js"></script>
+  </head>
+
+  <body>
+    <div class="preloader">
+      <div class="loading">
+        <div class="spinner-border" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="app">
+      <div class="main-wrapper">
+        <div id="m_navbar"></div>
+
+        <div class="main-sidebar position-fixed">
+          <aside id="sidebar-wrapper"></aside>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+          <section class="section">
+            <div class="section-body">
+              <div class="row">
+                <div class="col-12">
+                  <div class="card h-100">
+                    <div class="card-header">
+                      <h4>Quiz</h4>
+                    </div>
+                    <div class="card-body">
+                      <div id="question"></div>
+                      <hr class="my-3" />
+                      <div class="form-group">
+                        <!-- Option -->
+                        <div
+                          class="selectgroup selectgroup-pills"
+                          id="option"
+                        ></div>
+                        <!-- End Option -->
+                      </div>
+                      <hr class="my-3" />
+                      <div id="correction" class="d-none"></div>
+                      <button
+                        id="next"
+                        class="btn btn-primary float-right d-none"
+                      >
+                        Selanjutnya
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+        <footer class="main-footer">
+          <div class="footer-left"></div>
+          <div class="footer-right"></div>
+        </footer>
+      </div>
+    </div>
+
+    <!-- General JS Scripts -->
+    <script src="./assets/libs/jquery/dist/jquery.min.js"></script>
+    <script src="./assets/components/m_sidebar.js"></script>
+    <script src="./assets/components/m_navbar.js"></script>
+
+    <script src="./assets/js/dependency.js"></script>
+
+    <script src="./assets/js/stisla.js"></script>
+
+    <!-- Template JS File -->
+    <script src="./assets/js/scripts.js"></script>
+    <script src="./assets/js/custom.js"></script>
+
+    <script>
+      // Selectric
+      if (jQuery().selectric) {
+        $(".selectric").selectric({
+          disableOnMobile: false,
+          nativeOnMobile: false,
+        });
+      }
+      var apiQuestion;
+      $.ajax({
+        type: "POST",
+        url: env.server + "/getQuestion",
+        async: false,
+        cache: false,
+        data: {
+          api_token: user.api_token,
+          url: getUrlParam("url"),
+        },
+        success: (data) => {
+          apiQuestion = data;
+        },
+      });
+      console.log(apiQuestion);
+      var numQuestion = 0,
+        score = 0,
+        finalScore;
+      // Pick one question
+      var getQuestion = (num) => {
+        const question = apiQuestion[num];
+        $("#question").html(question.question);
+        // Show all answer
+        var htmlOption = "";
+
+        $("#correction").html(
+          `<h5 class="h5">Pembahasan</h5>` +
+            apiQuestion[numQuestion].correction +
+            `<p class="text-success font-weight-bold">Jadi, jawaban yang benar adalah ${question.answer}</p>`
+        );
+
+        $("#option").html(`
+                  <div class="d-flex">
+                    <label class="selectgroup-item">
+                      <input
+                        type="radio"
+                        name="icon-input"
+                        value="A"
+                        class="selectgroup-input"
+                        onclick="checkAnswer(${
+                          question.answer == "A" ? true : false
+                        })"
+                      />
+                      <span
+                        class="selectgroup-button selectgroup-button-icon"
+                        >A</span
+                      >
+                    </label>
+                    ${question.a_option}
+                  </div>
+
+                  <div class="d-flex">
+                    <label class="selectgroup-item">
+                      <input
+                        type="radio"
+                        name="icon-input"
+                        value="B"
+                        class="selectgroup-input"
+                        onclick="checkAnswer(${
+                          question.answer == "B" ? true : false
+                        })"
+                      />
+                      <span
+                        class="selectgroup-button selectgroup-button-icon"
+                        >B</span
+                      >
+                    </label>
+                    ${question.b_option}
+                  </div>
+
+                  <div class="d-flex">
+                    <label class="selectgroup-item">
+                      <input
+                        type="radio"
+                        name="icon-input"
+                        value="C"
+                        class="selectgroup-input"
+                        onclick="checkAnswer(${
+                          question.answer == "C" ? true : false
+                        })"
+                      />
+                      <span
+                        class="selectgroup-button selectgroup-button-icon"
+                        >C</span
+                      >
+                    </label>
+                    ${question.c_option}
+                  </div>
+
+                  <div class="d-flex">
+                    <label class="selectgroup-item">
+                      <input
+                        type="radio"
+                        name="icon-input"
+                        value="D"
+                        class="selectgroup-input"
+                        onclick="checkAnswer(${
+                          question.answer == "D" ? true : false
+                        })"
+                      />
+                      <span
+                        class="selectgroup-button selectgroup-button-icon"
+                        >C</span
+                      >
+                    </label>
+                    ${question.d_option}
+                  </div>
+                  `);
+      };
+
+      getQuestion(numQuestion);
+      $("#next").click(() => {
+        numQuestion++;
+        $("#next").addClass("d-none");
+        if (numQuestion < apiQuestion.length) {
+          $(".selectric").selectric("refresh");
+          $("#option").css("pointer-events", "auto");
+          $("#correction").addClass("d-none");
+          getQuestion(numQuestion);
+        } else {
+          if (finalScore == undefined) {
+            finalScore = Math.floor(score);
+            console.log(finalScore);
+            $("#question").html(
+              `<p>Selamat, Anda telah menyelesaikan soal ini</p><br><p>Score kamu: ${finalScore}</p>`
+            );
+            $("#option").html("");
+            $("#next").html("Finish");
+            $("#correction").addClass("d-none");
+
+            $.ajax({
+              type: "POST",
+              url: env.server + "/postScore",
+              async: false,
+              data: {
+                api_token: user.api_token,
+                url: getUrlParam("url"),
+                score: finalScore,
+              },
+              success: (data) => {
+                // iziToast.success({
+                //   title: data.status,
+                //   message: data.message,
+                //   position: "topRight",
+                // });
+                $("#next").addClass("d-none");
+              },
+            });
+          } else {
+            window.location.href = "./lessonList.html";
+          }
+        }
+      });
+
+      // Check answer
+      const checkAnswer = (isCorrect) => {
+        if (isCorrect) {
+          score += 100 / apiQuestion.length;
+          Swal.fire("Good job!", "You clicked the correct answer!", "success");
+        } else {
+          Swal.fire("Oops...", "You clicked the wrong answer!", "error");
+        }
+        $("#correction").removeClass("d-none");
+        $("#option").css("pointer-events", "none");
+        $("#next").removeClass("d-none");
+      };
+    </script>
+  </body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no"
+      name="viewport"
+    />
+
+    <!-- General CSS Files -->
+    <link rel="stylesheet" href="./assets/css/dependency.css" />
+    <link rel="stylesheet" href="./assets/libs/fontawesome/css/all.min.css" />
+    <link rel="stylesheet" href="./assets/css/style.css" />
+    <link rel="stylesheet" href="./assets/css/components.css" />
+
+    <!-- CSS Libraries -->
+
+    <link rel="stylesheet" href="./assets/css/custom.css" />
+
+    <!-- Middlewares -->
+    <script src="./assets/js/middleware/auth.js"></script>
+  </head>
+
+  <body>
+    <div class="preloader">
+      <div class="loading">
+        <div class="spinner-border" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+    </div>
+    <div id="app">
+      <div class="main-wrapper">
+        <div id="m_navbar"></div>
+
+        <div class="main-sidebar position-fixed">
+          <aside id="sidebar-wrapper"></aside>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+          <section class="section">
+            <div class="section-body">
+              <div class="row" style="height: 9rem">
+                <div class="col-8">
+                  <div class="card">
+                    <div class="card-header">
+                      <h4>My Picture</h4>
+                    </div>
+                    <div class="card-body">
+                      <div class="embed-responsive embed-responsive-16by9">
+                        <div id="ytplayer" class="embed-item"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="card">
+                    <div class="card-body d-flex align-items-center">
+                      <div
+                        class="empty-state"
+                        data-height="400"
+                        style="height: 400px"
+                      >
+                        <div class="empty-state-icon bg-danger">
+                          <i class="fas fa-times"></i>
+                        </div>
+                        <h2 id="msgTitle">Tonton Sampai Habis.</h2>
+                        <p style="line-height: 1.2rem" id="msgDescription">
+                          Silahkan tonton video yang ada di sini untuk menjawab
+                          soal di halaman selanjutnya.
+                        </p>
+                        <div class="d-block w-100" id="parentProgress">
+                          <div class="progress mb-3">
+                            <div
+                              class="progress-bar"
+                              role="progressbar"
+                              data-width="0%"
+                              data-valuenow="0"
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                              style="width: 0%"
+                              id="progressvideo"
+                            >
+                              0%
+                            </div>
+                          </div>
+                        </div>
+
+                        <a
+                          href="#"
+                          class="btn btn-primary mt-0 d-none"
+                          id="btnNext"
+                          >Lanjut</a
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+        <footer class="main-footer">
+          <div class="footer-left"></div>
+          <div class="footer-right"></div>
+        </footer>
+      </div>
+    </div>
+    <script src="./assets/libs/jquery/dist/jquery.min.js"></script>
+
+    <!-- Components -->
+    <script src="./assets/components/m_sidebar.js"></script>
+    <script src="./assets/components/m_navbar.js"></script>
+
+    <script src="./assets/js/dependency.js"></script>
+    <script src="./assets/js/stisla.js"></script>
+
+    <!-- Template JS File -->
+    <script src="./assets/js/scripts.js"></script>
+    <script src="./assets/js/custom.js"></script>
+
+    <!-- Middleware -->
+
+    <script>
+      $("[data-link=materi]").addClass("active");
+      var ytag = document.createElement("script");
+      ytag.src = "https://www.youtube.com/player_api";
+      var firstScriptTag = document.getElementsByTagName("script")[0];
+      firstScriptTag.parentNode.insertBefore(ytag, firstScriptTag);
+
+      var player;
+      function onYouTubePlayerAPIReady() {
+        player = new YT.Player("ytplayer", {
+          videoId: getUrlParam("url"),
+          events: {
+            onReady: () => {
+              const checkduration = setInterval(() => {
+                //sync youtube with progress bar
+                var currentTime = player.getCurrentTime();
+                var duration = player.getDuration();
+                var percent = (currentTime / duration) * 100;
+                $("#progressvideo").css("width", percent + "%");
+                $("#progressvideo").html(Math.floor(percent) + "%");
+                if (player.getPlayerState() === 0) {
+                  clearInterval(checkduration);
+                  $("#parentProgress").removeClass("d-block");
+                  $("#parentProgress").addClass("d-none");
+                  $("#btnNext").removeClass("d-none");
+                  $("#btnNext").attr(
+                    "href",
+                    `./exercise.html?url=${getUrlParam("url")}`
+                  );
+
+                  $(".empty-state-icon").removeClass("bg-danger");
+                  $(".empty-state-icon").addClass("bg-success");
+                  $(".empty-state-icon i").removeClass("fa-times");
+                  $(".empty-state-icon i").addClass("fa-check");
+                  $("#msgTitle").html("Videonya sudah selesai.");
+                  $("#msgDescription").html(
+                    "Silahkan lanjut ke halaman selanjutnya atau kamu bisa mengulang video ini."
+                  );
+                }
+              }, 500);
+            },
+          },
+        });
+      }
+    </script>
+  </body>
+</html>

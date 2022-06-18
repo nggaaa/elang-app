@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no"
+      name="viewport"
+    />
+    <link rel="stylesheet" href="./assets/css/dependency.css" />
+
+    <link rel="stylesheet" href="./assets/libs/fontawesome/css/all.min.css" />
+
+    <!-- CSS Libraries -->
+
+    <!-- CSS Libraries -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.datatables.net/v/bs4/dt-1.12.1/r-2.3.0/datatables.min.css"
+    />
+
+    <!-- Template CSS -->
+    <link rel="stylesheet" href="./assets/css/style.css" />
+    <link rel="stylesheet" href="./assets/css/components.css" />
+    <link rel="stylesheet" href="./assets/css/custom.css" />
+    <!-- Middlewares -->
+    <script src="./assets/js/middleware/auth.js"></script>
+  </head>
+
+  <body>
+    <div class="preloader">
+      <div class="loading">
+        <div class="spinner-border" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+    </div>
+    <div id="app">
+      <div class="main-wrapper main-wrapper-1">
+        <div id="m_navbar"></div>
+        <div class="main-sidebar sidebar-style-2">
+          <aside id="sidebar-wrapper"></aside>
+        </div>
+        <!-- Main Content -->
+        <div class="main-content">
+          <section class="section">
+            <div class="section-header">
+              <h1>Ranked</h1>
+              <div class="section-header-breadcrumb">
+                <select class="form-control" id="subject">
+                  <option value="1">Bahasa Inggris</option>
+                  <option value="2">Bahasa Arab</option>
+                </select>
+              </div>
+            </div>
+            <div class="section-body">
+              <p class="section-lead">
+                Di halaman ini anda dapat melihat ranking dari hasil penilaian
+                dari pengerjaan soal dan aktifitas anda. Jadilah yang pertama
+                dalam ranking anda.
+              </p>
+
+              <div class="row">
+                <div class="col-12">
+                  <div class="card">
+                    <div class="card-body">
+                      <div class="table-responsive">
+                        <table class="table table-striped datatables">
+                          <thead>
+                            <tr>
+                              <th class="text-center">#</th>
+                              <th colspan="2">Nama</th>
+                              <th>Ranked</th>
+                              <th>Score</th>
+                              <th>Action</th>
+                            </tr>
+                          </thead>
+                          <tbody id="tableBody"></tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+        <footer class="main-footer">
+          <div class="footer-left"></div>
+          <div class="footer-right"></div>
+        </footer>
+      </div>
+    </div>
+
+    <!-- General JS Scripts -->
+    <script src="./assets/libs/jquery/dist/jquery.min.js"></script>
+    <script src="./assets/components/m_sidebar.js"></script>
+    <script src="./assets/components/m_navbar.js"></script>
+    <script src="./assets/js/dependency.js"></script>
+    <script src="./assets/js/stisla.js"></script>
+    <script src="assets/js/stisla.js"></script>
+
+    <script
+      type="text/javascript"
+      src="https://cdn.datatables.net/v/bs4/dt-1.12.1/r-2.3.0/datatables.min.js"
+    ></script>
+
+    <!-- Page Specific JS File -->
+    <script>
+      $(document).ready(function () {
+        $(".datatables").DataTable({
+          columnDefs: [{ sortable: false, targets: [2, 3, 5] }],
+        });
+      });
+    </script>
+
+    <!-- Template JS File -->
+    <script src="assets/js/scripts.js"></script>
+    <script src="assets/js/custom.js"></script>
+    <script>
+      $("[data-link=rank]").addClass("active");
+      var allUser;
+      $.ajax({
+        type: "POST",
+        url: env.server + "/user/all",
+        async: false,
+        data: {
+          api_token: user.api_token,
+        },
+        success: (data) => {
+          allUser = data;
+          renderData(allUser, 1);
+        },
+      });
+
+      function renderData(data, category) {
+        if (category == 1) {
+          data = allUser.sort(sort_by("eng_score", true, parseInt));
+        }
+        if (category == 2) {
+          data = allUser.sort(sort_by("arab_score", true, parseInt));
+        }
+        let html = "";
+        data.forEach((item, index) => {
+          html += `
+            <tr>
+              <td class="text-center">${index + 1}</td>
+              <td>
+                <img
+                  alt="image"
+                  src="https://raw.githubusercontent.com/nggaaa/elang-app/master/src-tauri/icons/Square30x30Logo.png"
+                  class="rounded-circle"
+                  width="35"
+                  data-toggle="tooltip"
+                  title="${item.name}"
+                />
+              </td>
+              <td>${item.name}</td>
+              <td>`;
+
+          if (category == 1) {
+            var x_score = item.eng_score;
+          } else if (category == 2) {
+            var x_score = item.arab_score;
+          }
+
+          if (x_score >= 0 && x_score <= 200) {
+            html += `
+                <div class="badge badge-secondary">Silver</div>`;
+          } else if (x_score >= 201 && x_score <= 500) {
+            html += `
+                <div class="badge badge-warning">Gold</div>`;
+          } else if (x_score >= 501 && x_score <= 1000) {
+            html += `
+                <div class="badge badge-info">Diamond</div>`;
+          }
+
+          html += `</td>`;
+          if (category == 1) {
+            html += `<td>${item.eng_score}</td>`;
+          }
+          if (category == 2) {
+            html += `<td>${item.arab_score}</td>`;
+          }
+          html += `<td>
+                <a href="#" class="btn btn-secondary">Detail</a>
+              </td>
+            </tr>
+          `;
+        });
+        $("#tableBody").html(html);
+      }
+      $("#subject").on("change", () => {
+        switch ($("#subject").val()) {
+          case "2":
+            renderData(allUser, 2);
+            break;
+          default:
+            renderData(allUser, 1);
+            break;
+        }
+      });
+    </script>
+  </body>
+</html>
